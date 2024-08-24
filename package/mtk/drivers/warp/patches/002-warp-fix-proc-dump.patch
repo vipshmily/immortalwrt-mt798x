@@ -5,7 +5,7 @@ Index: warp/warp_proc.c
 @@ -452,6 +452,11 @@ warp_proc_ctrl_write(struct file *file,
  	char *s = value;
  	struct warp_entry *warp = (struct warp_entry *)PDE_DATA(file_inode(file));
-
+ 
 +	if (len1 > 64 || len1 == 0) {
 +		warp_dbg(WARP_DBG_OFF, "%s(): invalid length len1 %d!\n", __func__, len1);
 +		goto end;

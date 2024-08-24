@@ -1,90 +1,52 @@
 /dts-v1/;
 #include "mt7981.dtsi"
-
 / {
-	model = "Livinet ZR-3020";
-	compatible = "livinet,zr-3020", "mediatek,mt7981";
+	compatible = "ikuai,q3000", "mediatek,mt7981-spim-snand-rfb";
+	model = "q3000";
 
 	aliases {
-		led-boot = &boot_led;
-		led-failsafe = &boot_led;
-		led-running = &running_led;
-		led-upgrade = &upgrade_led;
+		led-boot = &red_led;
+		led-failsafe = &red_led;
+		led-running = &green_led;
+		led-upgrade = &blue_led;
 	};
 
 	chosen {
-		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000";
-	};
-
-	memory {
-		reg = <0 0x40000000 0 0x10000000>;
-	};
-
-	gpio-leds {
-		compatible = "gpio-leds";
-
-		led-0 {
-			label = "red:d8";
-			gpios = <&pio 6 GPIO_ACTIVE_LOW>;
-		};
-
-		led-1 {
-			label = "blue:internet";
-			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
-		};
-
-		running_led: led-2 {
-			label = "blue:running";
-			gpios = <&pio 9 GPIO_ACTIVE_LOW>;
-		};
-
-		upgrade_led: led-3 {
-			label = "green:upgrade";
-			gpios = <&pio 10 GPIO_ACTIVE_LOW>;
-		};
-
-		boot_led: led-4 {
-			label = "red:boot";
-			gpios = <&pio 11 GPIO_ACTIVE_LOW>;
-		};
-
-		led-6 {
-			label = "blue:d7";
-			gpios = <&pio 12 GPIO_ACTIVE_LOW>;
-		};
-
-		led-7 {
-			label = "blue:wlan2g";
-			gpios = <&pio 34 GPIO_ACTIVE_LOW>;
-		};
-
-		led-8 {
-			label = "blue:wlan5g";
-			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
-		};
+		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000 clk_ignore_unused";
 	};
 
 	gpio-keys {
 		compatible = "gpio-keys";
-
-		button-reset {
+		reset {
 			label = "reset";
 			linux,code = <KEY_RESTART>;
 			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
 		};
 
-		button-wps {
+		wps {
 			label = "wps";
 			linux,code = <KEY_WPS_BUTTON>;
 			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
 		};
 	};
 
-	gsw: gsw@0 {
-		compatible = "mediatek,mt753x";
-		mediatek,ethsys = <&ethsys>;
-		#address-cells = <1>;
-		#size-cells = <0>;
+	leds {
+		compatible = "gpio-leds";
+
+		green_led: green {
+			label = "q3000:green";
+			gpios = <&pio 11 1>;
+		};
+
+		red_led: red {
+			label = "q3000:red";
+			gpios = <&pio 10 1>;
+		};
+
+		blue_led: blue {
+			label = "q3000:blue";
+			gpios = <&pio 12 1>;
+		};
 	};
 
 	nmbm_spim_nand {
@@ -103,45 +65,65 @@
 
 			partition@0 {
 				label = "BL2";
-				reg = <0x00000 0x100000>;
+				reg = <0x00000 0x0100000>;
 				read-only;
 			};
 
 			partition@100000 {
 				label = "u-boot-env";
-				reg = <0x100000 0x80000>;
+				reg = <0x0100000 0x0080000>;
 			};
 
 			partition@180000 {
 				label = "Factory";
-				reg = <0x180000 0x200000>;
+				reg = <0x180000 0x0200000>;
 			};
 
 			partition@380000 {
 				label = "FIP";
-				reg = <0x380000 0x200000>;
+				reg = <0x380000 0x0200000>;
 			};
 
 			partition@580000 {
 				label = "ubi";
 				reg = <0x580000 0x4000000>;
 			};
-
-			partition@4580000 {
-				label = "firmware_backup";
-				reg = <0x4580000 0x2000000>;
-			};
-
-			partition@6580000 {
-				label = "zrsave";
-				reg = <0x6580000 0x100000>;
-			};
-
-			partition@6680000 {
-				label = "config2";
-				reg = <0x6680000 0x100000>;
-			};
 		};
+	};
+
+	sound_wm8960 {
+		compatible = "mediatek,mt79xx-wm8960-machine";
+		mediatek,platform = <&afe>;
+		audio-routing = "Headphone", "HP_L",
+				"Headphone", "HP_R",
+				"LINPUT1", "AMIC",
+				"RINPUT1", "AMIC";
+		mediatek,audio-codec = <&wm8960>;
+		status = "disabled";
+	};
+
+	sound_si3218x {
+		compatible = "mediatek,mt79xx-si3218x-machine";
+		mediatek,platform = <&afe>;
+		mediatek,ext-codec = <&proslic_spi>;
+		status = "disabled";
+	};
+};
+
+&afe {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcm_pins>;
+	status = "okay";
+};
+
+&i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c_pins>;
+	status = "disabled";
+
+	wm8960: wm8960@1a {
+		compatible = "wlf,wm8960";
+		reg = <0x1a>;
 	};
 };
 
@@ -168,59 +150,60 @@
 		};
 	};
 
-	gmac1: mac@1 {
-		compatible = "mediatek,eth-mac";
-		reg = <1>;
-		phy-mode = "2500base-x";
-
-		fixed-link {
-			speed = <2500>;
-			full-duplex;
-			pause;
-		};
-	};
 
 	mdio: mdio-bus {
 		#address-cells = <1>;
 		#size-cells = <0>;
-	};
-};
 
-&gsw {
-	mediatek,mdio = <&mdio>;
-	mediatek,mdio_master_pinmux = <0>;
-	reset-gpios = <&pio 39 0>;
-	interrupt-parent = <&pio>;
-	interrupts = <38 IRQ_TYPE_LEVEL_HIGH>;
-	status = "okay";
+		switch@0 {
+			compatible = "mediatek,mt7531";
+			reg = <31>;
+			reset-gpios = <&pio 39 0>;
 
-	port5: port@5 {
-		compatible = "mediatek,mt753x-port";
-		reg = <5>;
-		phy-mode = "sgmii";
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
 
-		fixed-link {
-			speed = <2500>;
-			full-duplex;
-		};
-	};
+				port@0 {
+					reg = <0>;
+					label = "lan1";
+				};
 
-	port6: port@6 {
-		compatible = "mediatek,mt753x-port";
-		mediatek,ssc-on;
-		reg = <6>;
-		phy-mode = "sgmii";
+				port@1 {
+					reg = <1>;
+					label = "lan2";
+				};
 
-		fixed-link {
-			speed = <2500>;
-			full-duplex;
+				port@2 {
+					reg = <2>;
+					label = "lan3";
+				};
+
+				port@3 {
+					reg = <3>;
+					label = "wan";
+				};
+
+				port@6 {
+					reg = <6>;
+					label = "cpu";
+					ethernet = <&gmac0>;
+					phy-mode = "2500base-x";
+
+					fixed-link {
+						speed = <2500>;
+						full-duplex;
+						pause;
+					};
+				};
+			};
 		};
 	};
 };
 
 &hnat {
-	mtketh-wan = "eth1";
-	mtketh-lan = "eth0";
+	mtketh-wan = "wan";
+	mtketh-lan = "lan";
 	mtketh-max-gmac = <2>;
 	status = "okay";
 };
@@ -229,15 +212,14 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&spi0_flash_pins>;
 	status = "okay";
-
 	spi_nand: spi_nand@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "spi-nand";
 		reg = <0>;
 		spi-max-frequency = <52000000>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
+		spi-tx-buswidth = <4>;
+		spi-rx-buswidth = <4>;
 	};
 };
 
@@ -261,7 +243,7 @@
 
 &pio {
 	i2c_pins: i2c-pins-g0 {
-        mux {
+		mux {
 			function = "i2c";
 			groups = "i2c0_0";
 		};
@@ -334,4 +316,15 @@
 			groups = "uart2_1";
 		};
 	};
+};
+
+&xhci {
+	mediatek,u3p-dis-msk = <0x0>;
+	phys = <&u2port0 PHY_TYPE_USB2>,
+	       <&u3port0 PHY_TYPE_USB3>;
+	status = "okay";
+};
+
+&trng {
+	status = "disabled";
 };
