@@ -710,7 +710,7 @@ static int hnat_probe(struct platform_device *pdev)
 
 	err = of_property_read_string(np, "mtketh-ppd", &name);
 	if (err < 0)
-		strncpy(hnat_priv->ppd, "eth0", IFNAMSIZ);
+		strncpy(hnat_priv->ppd, "wan", IFNAMSIZ);
 	else
 		strncpy(hnat_priv->ppd, (char *)name, IFNAMSIZ - 1);
 	dev_info(&pdev->dev, "ppd = %s\n", hnat_priv->ppd);
@@ -735,6 +735,9 @@ static int hnat_probe(struct platform_device *pdev)
 	}
 
 	hnat_priv->ppe_num = ppe_cnt;
+
+	if (IS_GMAC1_MODE)
+		hnat_priv->ppe_num = 1;
 
 	dev_info(&pdev->dev, "ppe num = %d\n", hnat_priv->ppe_num);
 

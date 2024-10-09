@@ -225,8 +225,8 @@
 #define MTK_MAX_IRQ_NUM			(4)
 #else
 #define MTK_PDMA_RSS_GLO_CFG		0x2800
-#define MTK_RX_NAPI_NUM			(1)
-#define MTK_MAX_IRQ_NUM			(3)
+#define MTK_RX_NAPI_NUM			(2)
+#define MTK_MAX_IRQ_NUM			(4)
 #endif
 #define MTK_RSS_RING1			(1)
 #define MTK_RSS_EN			BIT(0)
@@ -511,11 +511,15 @@
 #define MTK_RX_DMA_BUF_SHIFT    8
 #define RX_DMA_SPORT_SHIFT      26
 #define RX_DMA_SPORT_MASK       0xf
+#define RX_DMA_CRSN_SHIFT      18
+#define RX_DMA_CRSN_MASK       0x1f
 #else
 #define MTK_RX_DMA_BUF_LEN      0x3fff
 #define MTK_RX_DMA_BUF_SHIFT    16
 #define RX_DMA_SPORT_SHIFT      19
 #define RX_DMA_SPORT_MASK       0x7
+#define RX_DMA_CRSN_SHIFT      14
+#define RX_DMA_CRSN_MASK       0x1f
 #endif
 
 /* QDMA descriptor txd4 */
@@ -558,6 +562,7 @@
 #define RX_DMA_SPECIAL_TAG	BIT(22)		/* switch header in packet */
 
 #define RX_DMA_GET_SPORT(_x) 	(((_x) >> RX_DMA_SPORT_SHIFT) & RX_DMA_SPORT_MASK)
+#define RX_DMA_GET_CRSN(_x) 	(((_x) >> RX_DMA_CRSN_SHIFT) & RX_DMA_CRSN_MASK)
 
 /* PDMA V2 descriptor rxd3 */
 #define RX_DMA_VTAG_V2          BIT(0)
@@ -1160,13 +1165,13 @@ enum mkt_eth_capabilities {
 		      MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA)
 
 #define MT7986_CAPS   (MTK_GMAC1_SGMII | MTK_GMAC2_SGMII | \
-                       MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA | MTK_NETSYS_RX_V2 | \
-                       MTK_NETSYS_V2)
+                       MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA | \
+                       MTK_NETSYS_V2 | MTK_NETSYS_RX_V2 | MTK_RSTCTRL_PPE1)
 
 #define MT7981_CAPS   (MTK_GMAC1_SGMII | MTK_GMAC2_SGMII | MTK_GMAC2_GEPHY | \
 			MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA | \
 			MTK_MUX_U3_GMAC2_TO_QPHY | MTK_U3_COPHY_V2 | \
-			MTK_NETSYS_V2)
+			MTK_NETSYS_V2 | MTK_RSTCTRL_PPE1)
 
 /* struct mtk_eth_data -	This is the structure holding all differences
  *				among various plaforms

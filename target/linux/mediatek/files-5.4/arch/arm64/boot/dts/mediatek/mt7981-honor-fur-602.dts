@@ -53,13 +53,6 @@
                         };
         };
 
-        gsw: gsw@0 {
-                compatible = "mediatek,mt753x";
-                mediatek,ethsys = <&ethsys>;
-                #address-cells = <1>;
-                #size-cells = <0>;
-        };
-
 	nmbm_spim_nand {
                 compatible = "generic,nmbm";
                 #address-cells = <1>;
@@ -115,64 +108,88 @@
 };
 
 &eth {
-    status = "okay";
+	status = "okay";
 
-    gmac0: mac@0 {
-        compatible = "mediatek,eth-mac";
-        reg = <0>;
-        phy-mode = "2500base-x";
-
-        fixed-link {
-            speed = <2500>;
-            full-duplex;
-            pause;
-        };
-    };
-
-	mdio: mdio-bus {
-		#address-cells = <1>;
-		#size-cells = <0>;
-	};
-};
-
-&gsw {
-        mediatek,mdio = <&mdio>;
-	mediatek,portmap = "wllll";
-        mediatek,mdio_master_pinmux = <0>;
-        reset-gpios = <&pio 39 0>;
-        interrupt-parent = <&pio>;
-        interrupts = <38 IRQ_TYPE_LEVEL_HIGH>;
-        status = "okay";
-
-	port5: port@5 {
-		compatible = "mediatek,mt753x-port";
-		reg = <5>;
-		phy-mode = "sgmii";
+	gmac0: mac@0 {
+		compatible = "mediatek,eth-mac";
+		reg = <0>;
+		phy-mode = "2500base-x";
 
 		fixed-link {
 			speed = <2500>;
 			full-duplex;
+			pause;
+		};
+	};
+	
+	gmac1: mac@1 {
+		compatible = "mediatek,eth-mac";
+		reg = <1>;
+		phy-mode = "2500base-x";
+
+		fixed-link {
+			speed = <2500>;
+			full-duplex;
+			pause;
 		};
 	};
 
-	port6: port@6 {
-		compatible = "mediatek,mt753x-port";
-		mediatek,ssc-on;
-		reg = <6>;
-		phy-mode = "sgmii";
 
-                fixed-link {
-                        speed = <2500>;
-                        full-duplex;
-                };
-        };
+	mdio: mdio-bus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		switch@0 {
+			compatible = "mediatek,mt7531";
+			reg = <31>;
+			reset-gpios = <&pio 39 0>;
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				port@0 {
+					reg = <0>;
+					label = "wan";
+				};
+
+				port@1 {
+					reg = <1>;
+					label = "lan1";
+				};
+
+				port@2 {
+					reg = <2>;
+					label = "lan2";
+				};
+
+				port@3 {
+					reg = <3>;
+					label = "lan3";
+				};
+				
+				port@6 {
+					reg = <6>;
+					label = "cpu";
+					ethernet = <&gmac0>;
+					phy-mode = "2500base-x";
+
+					fixed-link {
+						speed = <2500>;
+						full-duplex;
+						pause;
+					};
+				};
+			};
+		};
+	};
 };
 
 &hnat {
-		mtketh-wan = "eth0.2";
-		mtketh-ppd = "eth0.1";
-		mtketh-lan = "eth0";
-		mtketh-max-gmac = <1>;
+		mtketh-wan = "eth1";
+	        mtketh-lan = "lan";
+	        mtketh-ppd = "eth1";
+	        mtketh-max-gmac = <2>;
 		status = "okay";
 };
 

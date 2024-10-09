@@ -16,7 +16,6 @@
 
 local mtwifi_defs = {}
 
-mtwifi_defs.dbdc_init_ifname = "ra0"
 mtwifi_defs.max_mbssid = 16
 mtwifi_defs.max_acl_entry = 129
 
@@ -50,6 +49,7 @@ mtwifi_defs.vif_cfgs = {
     ["RTSThreshold"] = "2347",
     ["HT_AMSDU"] = "1",
     ["HT_AutoBA"] = "1",
+    ["HT_BAWinSize"] = "256",
     ["HT_GI"] = "1",
     ["HT_LDPC"] = "1",
     ["HT_OpMode"] = "0",
@@ -62,14 +62,15 @@ mtwifi_defs.vif_cfgs = {
     ["VHT_LDPC"] = "1",
     ["VHT_SGI"] = "1",
     ["VHT_STBC"] = "1",
-    ["MuMimoDlEnable"] = "1",
-    ["MuMimoUlEnable"] = "1",
+    ["MuMimoDlEnable"] = "0",
+    ["MuMimoUlEnable"] = "0",
     ["MuOfdmaDlEnable"] = "1",
     ["MuOfdmaUlEnable"] = "1",
     ["DLSCapable"] = "0",
     ["WdsEnable"] = "0",
     ["WscConfMode"] = "0",
     ["TxRate"] = "0",
+    ["DtimPeriod"] = "1",
 }
 
 mtwifi_defs.vif_cfgs_idx = {
@@ -86,7 +87,6 @@ mtwifi_defs.vif_acl = {
 mtwifi_defs.chip_cfgs = {
     -- uci config = dat config, default value
     ["beacon_int"] = { "BeaconPeriod" , "100"},
-    ["dtim_period"] = { "DtimPeriod", "1"},
     ["whnat"] = { "WHNAT", "1"},
     ["bandsteering"] = { "BandSteering", "0"},
 }
@@ -116,7 +116,7 @@ mtwifi_defs.enc2dat = {
     ["psk2"] = {"WPA2PSK", "AES"},
     ["psk+tkip+ccmp"] = {"WPAPSK", "AES"},
     ["psk+tkip+aes"] = {"WPAPSK", "AES"},
-    ["psk+tkip"] = {"WPAPSK", "TKIP"},
+    ["psk+tkip"] = {"WPAPSK", "AES"},
     ["psk+ccmp"] = {"WPAPSK", "AES"},
     ["psk+aes"] = {"WPAPSK", "AES"},
     ["psk"] = {"WPAPSK", "AES"},
